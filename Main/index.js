@@ -1,6 +1,6 @@
 const express = require('express');
 const mongoose = require('mongoose');
-const userRoutes = require('./routes/user-routes');
+const apiRoutes = require('./api');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -16,8 +16,8 @@ mongoose.connect('mongodb://localhost/social_network', {
   useFindAndModify: false,
 });
 
-// Routes
-app.use(userRoutes);
+// API Routes
+app.use('/api', apiRoutes);
 
 // Start the server
 app.listen(PORT, () => {
