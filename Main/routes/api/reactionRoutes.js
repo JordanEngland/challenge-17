@@ -1,6 +1,5 @@
 const router = require('express').Router();
-const { Thought, reactionSchema } = require('../models');
-
+const { Thought } = require('../../models'); // Add the import for Thought model
 
 // POST to create a reaction stored in a single thought's reactions array field
 router.post('/api/thoughts/:thoughtId/reactions', async (req, res) => {

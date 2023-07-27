@@ -1,56 +1,48 @@
-const connection = require('../config/connection');
-const { Course, Student } = require('../models');
-const { getRandomName, getRandomAssignments } = require('./data');
+const mongoose = require('mongoose');
+const { User, Thought } = require('../models');
+const { initialUsers, initialThoughts } = require('./data');
 
-connection.on('error', (err) => err);
+const seedDatabase = async () => {
+  try {
+    // Clear the existing data from the collections
+    await User.deleteMany();
+    await Thought.deleteMany();
 
-connection.once('open', async () => {
-  console.log('connected');
-    // Delete the collections if they exist
-    let courseCheck = await connection.db.listCollections({ name: 'courses' }).toArray();
-    if (courseCheck.length) {
-      await connection.dropCollection('courses');
+    // Create new users and thoughts
+    const users = await User.create(initialUsers);
+    const thoughts = await Thought.create(initialThoughts);
+
+    // Add thoughts to the user's thoughts array
+    for (let i = 0; i < users.length; i++) {
+      users[i].thoughts.push(thoughts[i]._id);
+      await users[i].save();
     }
 
-    let studentsCheck = await connection.db.listCollections({ name: 'students' }).toArray();
-    if (studentsCheck.length) {
-      await connection.dropCollection('students');
-    }
-
-
-  // Create empty array to hold the students
-  const students = [];
-
-  // Loop 20 times -- add students to the students array
-  for (let i = 0; i < 20; i++) {
-    // Get some random assignment objects using a helper function that we imported from ./data
-    const assignments = getRandomAssignments(20);
-
-    const fullName = getRandomName();
-    const first = fullName.split(' ')[0];
-    const last = fullName.split(' ')[1];
-    const github = `${first}${Math.floor(Math.random() * (99 - 18 + 1) + 18)}`;
-
-    students.push({
-      first,
-      last,
-      github,
-      assignments,
-    });
+    console.log('Database seeded successfully!');
+  } catch (err) {
+    console.error('Error seeding the database:', err);
+    process.exit(1); // Exit the process with a non-zero code (failure)
   }
+};
 
-  // Add students to the collection and await the results
-  await Student.collection.insertMany(students);
-
-  // Add courses to the collection and await the results
-  await Course.collection.insertOne({
-    courseName: 'UCLA',
-    inPerson: false,
-    students: [...students],
+// Connect to the database and seed it with initial data
+mongoose
+  .connect('mongodb://localhost/social_network', {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+  })
+  .then(() => {
+    seedDatabase()
+      .then(() => {
+        // Close the database connection after all seeding operations are completed
+        mongoose.connection.close();
+      })
+      .catch((err) => {
+        console.error('Error seeding the database:', err);
+        mongoose.connection.close();
+      });
+  })
+  .catch((err) => {
+    console.error('Failed to connect to MongoDB:', err);
+    process.exit(1); // Exit the process with a non-zero code (failure)
   });
-
-  // Log out the seed data to indicate what should appear in the database
-  console.table(students);
-  console.info('Seeding complete! 🌱');
-  process.exit(0);
-});

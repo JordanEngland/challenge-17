@@ -1,25 +1,25 @@
 const express = require('express');
-const mongoose = require('mongoose');
-const apiRoutes = require('./api');
+const connectDB = require('./config/connection');
+const apiRoutes = require('./routes/api');
 
 const app = express();
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 3001;
 
 // Middleware
 app.use(express.json());
 
 // Connect to MongoDB
-mongoose.connect('mongodb://localhost/social_network', {
-  useNewUrlParser: true,
-  useUnifiedTopology: true,
-  useCreateIndex: true,
-  useFindAndModify: false,
-});
+connectDB()
+  .then(() => {
+    // API Routes
+    app.use('/api', apiRoutes);
 
-// API Routes
-app.use('/api', apiRoutes);
-
-// Start the server
-app.listen(PORT, () => {
-  console.log(`Server is running on http://localhost:${PORT}`);
-});
+    // Start the server
+    app.listen(PORT, () => {
+      console.log(`Server is running on http://localhost:${PORT}`);
+    });
+  })
+  .catch((err) => {
+    console.error('Failed to connect to MongoDB:', err);
+    process.exit(1); // Exit the process with a non-zero code (failure)
+  });
