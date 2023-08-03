@@ -5,6 +5,8 @@
 
 The "NoSQL Social Network API" project is a backend application that provides the foundation for a social networking platform. Built using Express.js and MongoDB with the Mongoose ODM, the API enables users to perform various operations, including creating and updating user profiles, sharing thoughts, reacting to thoughts, and managing friend lists. The API follows RESTful principles and supports CRUD (Create, Read, Update, Delete) operations for users and thoughts, along with adding and removing friends and reactions. With its ability to handle large amounts of unstructured data and efficiently manage user interactions, the "NoSQL Social Network API" lays the groundwork for a full-fledged social networking web application.
 
+Link to walkthrough video https://drive.google.com/file/d/139w9d8TJ9W-wM3UHHfzKsUezPjzfwPg8/view
+
 ## Table of Contents
 
 - [Usage](#usage)
