@@ -1,14 +1,28 @@
 const router = require('express').Router();
-const { User } = require('../../models');
+const {
+  getAllUsers,
+  getSingleUser,
+  createUser,
+  updateUser,
+  deleteUser,
+  addFriend,
+  removeFriend,
+} = require('../../controllers/userController');
 
-// GET all users
-router.get('/api/users', async (req, res) => {
-  try {
-    const users = await User.find();
-    res.json(users);
-  } catch (err) {
-    res.status(500).json(err);
-  }
-});
+// /api/users
+router.route('/').get(getAllUsers).post(createUser);
+
+// /api/users/:userId
+router
+  .route('/:userId')
+  .get(getSingleUser)
+  .put(updateUser)
+  .delete(deleteUser);
+
+// /api/users/:userId/friends/:friendId
+router
+  .route('/:userId/friends/:friendId')
+  .post(addFriend)
+  .delete(removeFriend);
 
 module.exports = router;
